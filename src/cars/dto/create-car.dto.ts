@@ -1,13 +1,26 @@
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
+  IsBoolean,
   IsIn,
   IsMongoId,
   IsNumber,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
-import { BODY_TYPE, Car, FUEL_TYPE } from '../types';
+import { Asset, BODY_TYPE, Car, FUEL_TYPE } from '../types';
 
+class AssetDto implements Asset {
+  @IsOptional()
+  @IsString()
+  name: string;
+
+  @IsBoolean()
+  primary: boolean;
+
+  @IsString()
+  source: string;
+}
 export class CreateCarDto implements Car {
   @IsOptional()
   @IsMongoId()
@@ -88,4 +101,9 @@ export class CreateCarDto implements Car {
 
   @IsNumber()
   price: number;
+
+  @ValidateNested({ each: true })
+  @Type(() => AssetDto)
+  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
+  assets: Asset[];
 }

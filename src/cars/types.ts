@@ -28,8 +28,15 @@ export type BODY_TYPE =
   | 'TRUCK'
   | 'VAN';
 
+export interface Asset {
+  _id?: string;
+  name?: string;
+  primary: boolean;
+  source: string;
+}
+
 export interface Car {
-  _id: string;
+  _id?: string;
   chassisNo: string;
   make: string;
   model: string;
@@ -43,4 +50,5 @@ export interface Car {
   door: number;
   bodyType: BODY_TYPE;
   price: number;
+  assets: Asset[];
 }

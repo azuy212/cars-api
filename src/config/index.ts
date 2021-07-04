@@ -1,3 +1,5 @@
+export const SERVER_PORT = 8888;
+
 const DB_HOST = 'localhost';
 const DB_PORT = 27017;
 const DB_NAME = 'primeTraders';

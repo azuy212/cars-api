@@ -1,11 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { BODY_TYPE, FUEL_TYPE } from '../types';
+import { Asset, BODY_TYPE, Car as ICar, FUEL_TYPE } from '../types';
 
 export type CarDocument = Car & Document;
 
-@Schema()
-export class Car {
+@Schema({ timestamps: true })
+export class Car implements ICar {
   @Prop(String)
   chassisNo: string;
 
@@ -44,6 +44,9 @@ export class Car {
 
   @Prop(Number)
   price: number;
+
+  @Prop({ type: [{ name: String, primary: Boolean, source: String }] })
+  assets: Asset[];
 }
 
 export const CarSchema = SchemaFactory.createForClass(Car);

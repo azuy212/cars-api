@@ -24,11 +24,16 @@ export class CarsService {
 
   update(id: string, updateCarDto: UpdateCarDto) {
     return this.carModel
-      .findOneAndUpdate({ _id: id }, updateCarDto, { new: true })
+      .findOneAndUpdate({ _id: id }, updateCarDto, {
+        new: true,
+        useFindAndModify: false,
+      })
       .exec();
   }
 
   remove(id: string) {
-    return this.carModel.findOneAndRemove({ _id: id }).exec();
+    return this.carModel
+      .findOneAndRemove({ _id: id }, { useFindAndModify: false })
+      .exec();
   }
 }
