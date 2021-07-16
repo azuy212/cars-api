@@ -51,4 +51,6 @@ export interface Car {
   bodyType: BODY_TYPE;
   price: number;
   assets: Asset[];
+  createdAt: string;
+  updatedAt: string;
 }
