@@ -11,7 +11,7 @@ import {
 import { CarsService } from './cars.service';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
-import { PageQuery } from './types';
+import { CarListFilterQuery, PageQuery } from './types';
 
 @Controller('cars')
 export class CarsController {
@@ -23,7 +23,7 @@ export class CarsController {
   }
 
   @Get()
-  findAll(@Query() page: PageQuery) {
+  findAll(@Query() page: PageQuery & CarListFilterQuery) {
     return this.carsService.findAll(page);
   }
 
