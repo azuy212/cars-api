@@ -51,6 +51,25 @@ export interface Car {
   bodyType: BODY_TYPE;
   price: number;
   assets: Asset[];
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface PageQuery {
+  page?: string;
+  size?: string;
+  sort?: string;
+  direction?: 'asc' | 'desc';
+}
+
+export interface Page<T> {
+  content: T[];
+  last: boolean;
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  sort: string;
+  first: boolean;
+  numberOfElements: number;
 }
