@@ -27,6 +27,11 @@ export class CarsController {
     return this.carsService.findAll(page);
   }
 
+  @Get('filters')
+  getFilters() {
+    return this.carsService.filters();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.carsService.findOne(id);

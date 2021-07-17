@@ -66,4 +66,50 @@ export class CarsService {
       .findOneAndRemove({ _id: id }, { useFindAndModify: false })
       .exec();
   }
+
+  async filters() {
+    const distinctFields = [
+      'make',
+      'transmission',
+      'fuelType',
+      'color',
+      'bodyType',
+    ];
+    const rangeFields = ['engineCapacity', 'year', 'price'];
+
+    const distinctModels = await Promise.all(
+      distinctFields.map((field) => this.carModel.distinct(field).exec()),
+    );
+
+    const rangeModels = await Promise.all(
+      [1, -1].map((sort) =>
+        Promise.all(
+          rangeFields.map((field) =>
+            this.carModel
+              .find()
+              .select(field)
+              .sort({ [field]: sort })
+              .limit(1),
+          ),
+        ),
+      ),
+    );
+
+    return {
+      ...distinctModels.reduce(
+        (acc, model, idx) => ({ ...acc, [distinctFields[idx]]: model }),
+        {},
+      ),
+      ...rangeFields.reduce(
+        (acc, cur, idx) => ({
+          ...acc,
+          [cur]: {
+            min: rangeModels[0][idx][0][cur],
+            max: rangeModels[1][idx][0][cur],
+          },
+        }),
+        {},
+      ),
+    };
+  }
 }
