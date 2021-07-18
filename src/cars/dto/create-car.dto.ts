@@ -106,4 +106,8 @@ export class CreateCarDto implements Car {
   @Type(() => AssetDto)
   @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
   assets: Asset[];
+
+  @IsString({ each: true })
+  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
+  features: string[];
 }

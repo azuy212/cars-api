@@ -14,6 +14,7 @@ export class CarsService {
     'fuelType',
     'color',
     'bodyType',
+    'features',
   ];
   private readonly rangeFields = ['engineCapacity', 'year', 'price'];
 

@@ -47,6 +47,9 @@ export class Car implements ICar {
 
   @Prop({ type: [{ name: String, primary: Boolean, source: String }] })
   assets: Asset[];
+
+  @Prop([String])
+  features: string[];
 }
 
 export const CarSchema = SchemaFactory.createForClass(Car);
