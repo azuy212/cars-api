@@ -57,6 +57,7 @@ export interface Car {
 }
 
 export type CarListFilterQuery = Record<keyof Car, string>;
+export type CarListFilterKey = keyof Car;
 
 export interface PageQuery {
   page?: string;

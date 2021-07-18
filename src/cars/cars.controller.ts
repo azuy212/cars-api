@@ -11,7 +11,7 @@ import {
 import { CarsService } from './cars.service';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
-import { CarListFilterQuery, PageQuery } from './types';
+import { CarListFilterKey, CarListFilterQuery, PageQuery } from './types';
 
 @Controller('cars')
 export class CarsController {
@@ -30,6 +30,14 @@ export class CarsController {
   @Get('filters')
   getFilters() {
     return this.carsService.filters();
+  }
+
+  @Get('filters/:filter')
+  getFilter(
+    @Param('filter') filter: CarListFilterKey,
+    @Query() criteria: CarListFilterQuery,
+  ) {
+    return this.carsService.filter(filter, criteria);
   }
 
   @Get(':id')

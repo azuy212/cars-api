@@ -1,22 +1,28 @@
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { Car, CarDocument } from './schemas/car.schema';
-import { CarListFilterQuery, Page, PageQuery } from './types';
+import { CarListFilterKey, CarListFilterQuery, Page, PageQuery } from './types';
 
 @Injectable()
 export class CarsService {
-  private readonly distinctFields = [
+  private readonly distinctFields: Array<CarListFilterKey> = [
     'make',
+    'model',
     'transmission',
     'fuelType',
     'color',
     'bodyType',
     'features',
   ];
-  private readonly rangeFields = ['engineCapacity', 'year', 'price'];
+  private readonly rangeFields: Array<CarListFilterKey> = [
+    'engineCapacity',
+    'year',
+    'price',
+  ];
 
   constructor(@InjectModel(Car.name) private carModel: Model<CarDocument>) {}
 
@@ -36,7 +42,7 @@ export class CarsService {
       ...filters
     } = pageQuery;
 
-    const query = this.buildQuery(filters);
+    const query = this.buildFilterQuery(filters);
 
     const [content, totalElements] = await Promise.all([
       this.carModel
@@ -63,14 +69,19 @@ export class CarsService {
     };
   }
 
-  private buildQuery(filter: CarListFilterQuery) {
+  private buildFilterQuery(filter: CarListFilterQuery) {
     return Object.keys(filter).reduce<FilterQuery<CarDocument>>(
-      (acc, key: keyof CarListFilterQuery) => {
+      (acc, key: CarListFilterKey) => {
         if (this.distinctFields.includes(key)) {
           acc[key] = { $in: filter[key].split(',') };
         } else if (this.rangeFields.includes(key)) {
-          const [$gte, $lte] = filter[key].split(',').map(Number);
-          acc[key] = { $gte, $lte };
+          const [min, max] = filter[key].split(',').map(Number);
+          if (max) {
+            const [$gte, $lte] = [Math.min(min, max), Math.max(min, max)];
+            acc[key] = { $gte, $lte };
+          } else {
+            acc[key] = { $gte: min };
+          }
         }
         return acc;
       },
@@ -98,30 +109,33 @@ export class CarsService {
   }
 
   async filters() {
-    const distinctModels = await Promise.all(
-      this.distinctFields.map((field) => this.carModel.distinct(field).exec()),
-    );
-
-    const rangeModels = await Promise.all(
-      [1, -1].map((sort) =>
-        Promise.all(
-          this.rangeFields.map((field) =>
-            this.carModel
-              .find()
-              .select(field)
-              .sort({ [field]: sort })
-              .limit(1),
+    const [distinctModels, rangeModels] = await Promise.all([
+      Promise.all(
+        this.distinctFields.map((field) =>
+          this.carModel.distinct(field).exec(),
+        ),
+      ),
+      Promise.all(
+        [1, -1].map((sort) =>
+          Promise.all(
+            this.rangeFields.map((field) =>
+              this.carModel
+                .find()
+                .select(field)
+                .sort({ [field]: sort })
+                .limit(1),
+            ),
           ),
         ),
       ),
-    );
+    ]);
 
     return {
-      ...distinctModels.reduce(
+      ...distinctModels.reduce<Record<string, string[]>>(
         (acc, model, idx) => ({ ...acc, [this.distinctFields[idx]]: model }),
         {},
       ),
-      ...this.rangeFields.reduce(
+      ...this.rangeFields.reduce<Record<string, { min: number; max: number }>>(
         (acc, cur, idx) => ({
           ...acc,
           [cur]: {
@@ -132,5 +146,27 @@ export class CarsService {
         {},
       ),
     };
+  }
+
+  async filter(filter: CarListFilterKey, criteria?: CarListFilterQuery) {
+    const query = this.buildFilterQuery(criteria);
+    if (this.distinctFields.includes(filter)) {
+      return this.carModel.distinct(filter, query).exec();
+    } else if (this.rangeFields.includes(filter)) {
+      const [min, max] = await Promise.all(
+        [1, -1].map((sort) =>
+          this.carModel
+            .find(query)
+            .select(filter)
+            .sort({ [filter]: sort })
+            .limit(1),
+        ),
+      );
+      return { min: min?.[0]?.[filter], max: max?.[0]?.[filter] };
+    }
+    throw new HttpException(
+      `Unknown filter provided: ${filter}`,
+      HttpStatus.BAD_REQUEST,
+    );
   }
 }
