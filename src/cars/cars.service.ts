@@ -72,15 +72,17 @@ export class CarsService {
   private buildFilterQuery(filter: CarListFilterQuery) {
     return Object.keys(filter).reduce<FilterQuery<CarDocument>>(
       (acc, key: CarListFilterKey) => {
-        if (this.distinctFields.includes(key)) {
-          acc[key] = { $in: filter[key].split(',') };
-        } else if (this.rangeFields.includes(key)) {
-          const [min, max] = filter[key].split(',').map(Number);
-          if (max) {
-            const [$gte, $lte] = [Math.min(min, max), Math.max(min, max)];
-            acc[key] = { $gte, $lte };
-          } else {
-            acc[key] = { $gte: min };
+        if (filter[key]) {
+          if (this.distinctFields.includes(key)) {
+            acc[key] = { $in: filter[key].split(',') };
+          } else if (this.rangeFields.includes(key)) {
+            const [min, max] = filter[key].split(',').map(Number);
+            if (max) {
+              const [$gte, $lte] = [Math.min(min, max), Math.max(min, max)];
+              acc[key] = { $gte, $lte };
+            } else {
+              acc[key] = { $gte: min };
+            }
           }
         }
         return acc;
