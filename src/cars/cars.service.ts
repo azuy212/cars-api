@@ -1,11 +1,16 @@
-import { HttpException, HttpStatus } from '@nestjs/common';
-import { Injectable } from '@nestjs/common';
+import {
+  CarDocument,
+  CarListFilterKey,
+  CarListFilterQuery,
+  Page,
+  PageQuery,
+} from '@/interfaces/car';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
-import { Car, CarDocument } from './schemas/car.schema';
-import { CarListFilterKey, CarListFilterQuery, Page, PageQuery } from './types';
+import { Car } from './schemas/car.schema';
 
 @Injectable()
 export class CarsService {
