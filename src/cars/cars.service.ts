@@ -49,13 +49,13 @@ export class CarsService {
 
     const query = this.buildFilterQuery(filters);
 
+    let carsQuery = this.carModel.find(query).sort({ [sort]: direction });
+    if (+size !== -1) {
+      carsQuery = carsQuery.skip(+page * +size).limit(+size);
+    }
+
     const [content, totalElements] = await Promise.all([
-      this.carModel
-        .find(query)
-        .skip(+page * +size)
-        .limit(+size)
-        .sort({ [sort]: direction })
-        .exec(),
+      carsQuery.exec(),
       this.carModel.countDocuments(query).exec(),
     ]);
 
