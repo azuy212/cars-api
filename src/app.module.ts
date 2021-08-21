@@ -1,30 +1,28 @@
+import { AuthModule } from '@/auth/auth.module';
+import { CarsModule } from '@/cars/cars.module';
+import configuration from '@/config';
+import { UsersModule } from '@/users/users.module';
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { CarsModule } from './cars/cars.module';
-import { ConfigModule } from '@nestjs/config';
+import { ContentModule } from './content/content.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ load: [configuration] }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: () => {
-        const {
-          DB_USER_NAME,
-          DB_PASSWORD,
-          DB_HOST = 'localhost:27017',
-          DB_NAME = 'primeTraders',
-        } = process.env;
-        return {
-          uri: DB_HOST.includes('localhost')
-            ? `mongodb://${DB_HOST}/${DB_NAME}`
-            : `mongodb+srv://${DB_USER_NAME}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}?retryWrites=true&w=majority`,
-        };
-      },
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        uri: configService.get('DB_URI'),
+      }),
     }),
     CarsModule,
+    AuthModule,
+    UsersModule,
+    ContentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

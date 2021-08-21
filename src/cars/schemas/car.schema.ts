@@ -1,8 +1,5 @@
+import { Asset, BODY_TYPE, Car as ICar, FUEL_TYPE } from '@/interfaces/car';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
-import { Asset, BODY_TYPE, Car as ICar, FUEL_TYPE } from '../types';
-
-export type CarDocument = Car & Document;
 
 @Schema({ timestamps: true })
 export class Car implements ICar {

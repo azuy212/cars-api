@@ -1,3 +1,5 @@
+import { Document } from 'mongoose';
+
 export type FUEL_TYPE =
   | 'PETROL'
   | 'HYBRID'
@@ -55,6 +57,8 @@ export interface Car {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export type CarDocument = Car & Document;
 
 export type CarListFilterQuery = Record<keyof Car, string>;
 export type CarListFilterKey = keyof Car;

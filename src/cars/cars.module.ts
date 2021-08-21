@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { CarsService } from './cars.service';
-import { CarsController } from './cars.controller';
 import { MongooseModule } from '@nestjs/mongoose';
+import { CarsController } from './cars.controller';
+import { CarsService } from './cars.service';
 import { Car, CarSchema } from './schemas/car.schema';
 
 @Module({

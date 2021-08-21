@@ -1,3 +1,4 @@
+import { Asset, BODY_TYPE, Car, FUEL_TYPE } from '@/interfaces/car';
 import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
@@ -8,7 +9,6 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { Asset, BODY_TYPE, Car, FUEL_TYPE } from '../types';
 
 class AssetDto implements Asset {
   @IsOptional()
